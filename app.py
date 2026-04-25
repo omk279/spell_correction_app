@@ -4,7 +4,7 @@ import language_tool_python
 from utils import readability_score, word_stats, highlight_changes, hinglish_to_english
 
 # Initialize grammar tool
-tool = language_tool_python.LanguageTool('en-US')
+tool = language_tool_python.LanguageToolPublicAPI('en-US')
 
 st.set_page_config(page_title="AI Writing Assistant", layout="centered")
 
