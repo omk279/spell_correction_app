@@ -5,23 +5,18 @@ from utils import (
     word_stats,
     highlight_changes,
     hinglish_to_english,
-    simple_grammar_check
+    simple_grammar_check,
+    smart_replace
 )
 
-# Page config
 st.set_page_config(page_title="AI Writing Assistant", layout="centered")
 
-# Title
 st.title("🧠 AI Writing Assistant")
 st.caption("Spell ✔ Grammar ✔ Readability ✔ Tone ✔ Hinglish Support")
 
-# Input
 text_input = st.text_area("✍️ Enter your text:")
-
-# Hinglish option
 use_hinglish = st.checkbox("Convert Hinglish to English")
 
-# Button
 if st.button("Analyze Text"):
 
     if text_input.strip() == "":
@@ -29,27 +24,30 @@ if st.button("Analyze Text"):
     else:
         original_text = text_input
 
-        # Step 1: Hinglish conversion
+        # Step 1: Hinglish
         if use_hinglish:
             text_input = hinglish_to_english(text_input)
 
-        # Step 2: Spell correction
+        # Step 2: Smart Replace (IMPORTANT)
+        text_input = smart_replace(text_input)
+
+        # Step 3: Spell correction
         blob = TextBlob(text_input)
         corrected = str(blob.correct())
 
-        # Step 3: Simple grammar check
+        # Step 4: Grammar (simple rules)
         grammar_errors = simple_grammar_check(corrected)
 
-        # Step 4: Sentiment analysis
+        # Step 5: Sentiment
         sentiment = blob.sentiment.polarity
 
-        # Step 5: Readability
+        # Step 6: Readability
         score = readability_score(corrected)
 
-        # Step 6: Word stats
+        # Step 7: Word stats
         word_count, sentence_count, freq = word_stats(corrected)
 
-        # Step 7: Highlight changes
+        # Step 8: Highlight changes
         highlighted = highlight_changes(original_text, corrected)
 
         # OUTPUT
@@ -82,7 +80,6 @@ if st.button("Analyze Text"):
         for word, count in freq:
             st.write(f"{word} → {count}")
 
-        # Download option
         st.download_button(
             "⬇ Download Corrected Text",
             corrected,
