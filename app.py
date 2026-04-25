@@ -1,50 +1,56 @@
 import streamlit as st
 from textblob import TextBlob
-import language_tool_python
-from utils import readability_score, word_stats, highlight_changes, hinglish_to_english
+from utils import (
+    readability_score,
+    word_stats,
+    highlight_changes,
+    hinglish_to_english,
+    simple_grammar_check
+)
 
-# Initialize grammar tool
-tool = language_tool_python.LanguageToolPublicAPI('en-US')
-
+# Page config
 st.set_page_config(page_title="AI Writing Assistant", layout="centered")
 
+# Title
 st.title("🧠 AI Writing Assistant")
-st.caption("Spell ✔ Grammar ✔ Readability ✔ Tone ✔ Analytics")
+st.caption("Spell ✔ Grammar ✔ Readability ✔ Tone ✔ Hinglish Support")
 
 # Input
 text_input = st.text_area("✍️ Enter your text:")
 
-# Hinglish toggle
-use_hinglish = st.checkbox("Convert Hinglish to English (basic)")
+# Hinglish option
+use_hinglish = st.checkbox("Convert Hinglish to English")
 
+# Button
 if st.button("Analyze Text"):
 
     if text_input.strip() == "":
         st.warning("Please enter some text!")
     else:
-        # Hinglish conversion
+        original_text = text_input
+
+        # Step 1: Hinglish conversion
         if use_hinglish:
             text_input = hinglish_to_english(text_input)
 
-        # Spell correction
+        # Step 2: Spell correction
         blob = TextBlob(text_input)
         corrected = str(blob.correct())
 
-        # Grammar check
-        matches = tool.check(corrected)
-        grammar_errors = len(matches)
+        # Step 3: Simple grammar check
+        grammar_errors = simple_grammar_check(corrected)
 
-        # Sentiment
+        # Step 4: Sentiment analysis
         sentiment = blob.sentiment.polarity
 
-        # Readability
+        # Step 5: Readability
         score = readability_score(corrected)
 
-        # Word stats
+        # Step 6: Word stats
         word_count, sentence_count, freq = word_stats(corrected)
 
-        # Highlight changes
-        highlighted = highlight_changes(text_input, corrected)
+        # Step 7: Highlight changes
+        highlighted = highlight_changes(original_text, corrected)
 
         # OUTPUT
         st.subheader("✅ Corrected Text")
@@ -76,7 +82,7 @@ if st.button("Analyze Text"):
         for word, count in freq:
             st.write(f"{word} → {count}")
 
-        # Download
+        # Download option
         st.download_button(
             "⬇ Download Corrected Text",
             corrected,
