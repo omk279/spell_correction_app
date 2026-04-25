@@ -1,6 +1,22 @@
 from collections import Counter
 
-# 🔹 1. Readability Score
+# 🔹 Smart Replace (MOST IMPORTANT)
+def smart_replace(text):
+    mapping = {
+        "ur": "your",
+        "ther": "there",
+        "err": "error",
+        "iss": "is",
+        "u": "you"
+    }
+
+    words = text.split()
+    corrected = [mapping.get(word.lower(), word) for word in words]
+
+    return " ".join(corrected)
+
+
+# 🔹 Readability Score
 def readability_score(text):
     words = text.split()
     sentences = text.count('.') + 1
@@ -13,7 +29,7 @@ def readability_score(text):
     return round(score, 2)
 
 
-# 🔹 2. Word Statistics
+# 🔹 Word Stats
 def word_stats(text):
     words = text.split()
     word_count = len(words)
@@ -23,13 +39,12 @@ def word_stats(text):
     return word_count, sentence_count, freq
 
 
-# 🔹 3. Highlight Changes (Safe version)
+# 🔹 Highlight Changes
 def highlight_changes(original, corrected):
     orig_words = original.split()
     corr_words = corrected.split()
 
     highlighted = []
-
     min_len = min(len(orig_words), len(corr_words))
 
     for i in range(min_len):
@@ -43,14 +58,13 @@ def highlight_changes(original, corrected):
         else:
             highlighted.append(o)
 
-    # If corrected sentence is longer
     if len(corr_words) > min_len:
         highlighted.extend(corr_words[min_len:])
 
     return " ".join(highlighted)
 
 
-# 🔹 4. Simple Hinglish to English
+# 🔹 Hinglish Converter
 def hinglish_to_english(text):
 
     mapping = {
@@ -85,29 +99,19 @@ def hinglish_to_english(text):
     }
 
     words = text.lower().split()
-    converted = []
-
-    for word in words:
-        if word in mapping:
-            converted.append(mapping[word])
-        else:
-            converted.append(word)
-
-    return " ".join(converted)
+    return " ".join([mapping.get(word, word) for word in words])
 
 
-# 🔹 5. Simple Grammar Check (Rule-based)
+# 🔹 Simple Grammar Check
 def simple_grammar_check(text):
     errors = 0
     words = text.split()
 
     for i in range(len(words) - 1):
 
-        # Rule 1: "he go" → incorrect
         if words[i].lower() in ["he", "she", "it"] and words[i+1].lower() == "go":
             errors += 1
 
-        # Rule 2: repeated words → "the the"
         if words[i].lower() == words[i+1].lower():
             errors += 1
 
