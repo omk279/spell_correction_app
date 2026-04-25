@@ -1,5 +1,6 @@
 from collections import Counter
 
+# 🔹 1. Readability Score
 def readability_score(text):
     words = text.split()
     sentences = text.count('.') + 1
@@ -12,6 +13,7 @@ def readability_score(text):
     return round(score, 2)
 
 
+# 🔹 2. Word Statistics
 def word_stats(text):
     words = text.split()
     word_count = len(words)
@@ -21,33 +23,92 @@ def word_stats(text):
     return word_count, sentence_count, freq
 
 
+# 🔹 3. Highlight Changes (Safe version)
 def highlight_changes(original, corrected):
     orig_words = original.split()
     corr_words = corrected.split()
 
     highlighted = []
 
-    for o, c in zip(orig_words, corr_words):
+    min_len = min(len(orig_words), len(corr_words))
+
+    for i in range(min_len):
+        o = orig_words[i]
+        c = corr_words[i]
+
         if o != c:
-            highlighted.append(f"<span style='color:red'>{o}</span> → <span style='color:green'>{c}</span>")
+            highlighted.append(
+                f"<span style='color:red'>{o}</span> → <span style='color:green'>{c}</span>"
+            )
         else:
             highlighted.append(o)
+
+    # If corrected sentence is longer
+    if len(corr_words) > min_len:
+        highlighted.extend(corr_words[min_len:])
 
     return " ".join(highlighted)
 
 
+# 🔹 4. Simple Hinglish to English
 def hinglish_to_english(text):
+
     mapping = {
         "mera": "my",
+        "meri": "my",
+        "mere": "my",
+        "mai": "I",
+        "main": "I",
         "tum": "you",
+        "tu": "you",
         "hai": "is",
+        "tha": "was",
+        "thi": "was",
+        "the": "were",
         "nahi": "not",
+        "kyu": "why",
         "kya": "what",
         "kaise": "how",
-        "kyu": "why"
+        "kab": "when",
+        "kaha": "where",
+        "dost": "friend",
+        "ghar": "home",
+        "khana": "food",
+        "aaya": "came",
+        "gaya": "went",
+        "kar": "do",
+        "raha": "doing",
+        "rahi": "doing",
+        "rahe": "doing",
+        "kal": "yesterday",
+        "aaj": "today"
     }
 
-    words = text.split()
-    converted = [mapping.get(word.lower(), word) for word in words]
+    words = text.lower().split()
+    converted = []
+
+    for word in words:
+        if word in mapping:
+            converted.append(mapping[word])
+        else:
+            converted.append(word)
 
     return " ".join(converted)
+
+
+# 🔹 5. Simple Grammar Check (Rule-based)
+def simple_grammar_check(text):
+    errors = 0
+    words = text.split()
+
+    for i in range(len(words) - 1):
+
+        # Rule 1: "he go" → incorrect
+        if words[i].lower() in ["he", "she", "it"] and words[i+1].lower() == "go":
+            errors += 1
+
+        # Rule 2: repeated words → "the the"
+        if words[i].lower() == words[i+1].lower():
+            errors += 1
+
+    return errors
